@@ -22,8 +22,9 @@ def write_nagios_output(text, perfdata):
         perfdata = perfdata.split('\n')
 
     sys.stdout.write(escape(text[0]))
-    sys.stdout.write(' | ')
-    sys.stdout.write(escape(perfdata[0]))
+    if len(perfdata) > 0:
+        sys.stdout.write(' | ')
+        sys.stdout.write(escape(perfdata[0]))
     sys.stdout.write('\n')
     for idx, line in enumerate(text[1:]):
         sys.stdout.write(escape(line))
@@ -38,7 +39,7 @@ def write_nagios_output(text, perfdata):
 
 def cmdline():
     try:
-        text, perfdata = main(sys.argv[1:])
+        text, perfdata = main(*sys.argv[1:])
         write_nagios_output(text, perfdata)
     except Exception as e:
         print(e)
