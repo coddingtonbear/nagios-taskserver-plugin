@@ -38,7 +38,7 @@ def write_nagios_output(text, perfdata):
 
 def cmdline():
     try:
-        text, perfdata = main(sys.stdin.read())
+        text, perfdata = main(sys.argv[1:])
         write_nagios_output(text, perfdata)
     except Exception as e:
         print(e)
