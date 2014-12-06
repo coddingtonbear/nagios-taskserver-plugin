@@ -1,2 +1,2 @@
 def main(stdin):
-    raise NotImplemented()
+    raise NotImplementedError()
