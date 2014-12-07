@@ -6,14 +6,18 @@ def main(*args):
     config_path = args[0]
 
     started = time.time()
-    subprocess.call(
-        [
-            'task',
-            'rc:%s' % config_path,
-            'sync',
-        ],
-        shell=True,
+    cmd = [
+        'task',
+        'rc:%s' % config_path,
+        'sync',
+    ]
+    proc = subprocess.Popen(
+        cmd,
+        shell=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
     )
+    _, _ = proc.communicate()
     finished = time.time()
 
     total_duration = finished - started
