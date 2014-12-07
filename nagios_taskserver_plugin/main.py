@@ -1,3 +1,5 @@
+import datetime
+import json
 import subprocess
 import time
 
@@ -21,7 +23,19 @@ def main(*args):
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE
     )
-    _, stderr = proc.communicate()
+    stdout, stderr = proc.communicate()
+    with open('/tmp/taskcheck.out', 'w') as out:
+        out.write(
+            json.dumps(
+                {
+                    'stdout': stdout,
+                    'stderr': stderr,
+                    'retcode': proc.returncode,
+                    'date': str(datetime.datetime.now())
+                },
+                indent=4
+            )
+        )
     if proc.returncode != 0:
         raise FailedToSynchronize(stderr)
     finished = time.time()
