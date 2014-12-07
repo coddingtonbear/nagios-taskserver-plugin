@@ -2,7 +2,7 @@ from __future__ import print_function
 
 import sys
 
-from .main import main
+from .main import main, FailedToSynchronize
 
 
 EXIT_OK = 0
@@ -41,7 +41,10 @@ def cmdline():
     try:
         text, perfdata = main(*sys.argv[1:])
         write_nagios_output(text, perfdata)
+    except FailedToSynchronize as e:
+        print(escape(str(e)))
+        sys.exit(EXIT_CRITICAL)
     except Exception as e:
-        print(e)
+        print(escape(str(e)))
         sys.exit(EXIT_UNKNOWN)
     sys.exit(EXIT_OK)

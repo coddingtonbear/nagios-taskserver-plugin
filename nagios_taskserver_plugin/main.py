@@ -2,6 +2,10 @@ import subprocess
 import time
 
 
+class FailedToSynchronize(Exception):
+    pass
+
+
 def main(*args):
     config_path = args[0]
 
@@ -17,7 +21,9 @@ def main(*args):
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE
     )
-    _, _ = proc.communicate()
+    _, stderr = proc.communicate()
+    if proc.returncode != 0:
+        raise FailedToSynchronize(stderr)
     finished = time.time()
 
     total_duration = finished - started
