@@ -1,4 +1,5 @@
 import subprocess
+import time
 
 
 class FailedToSynchronize(Exception):
@@ -8,6 +9,7 @@ class FailedToSynchronize(Exception):
 def main(*args):
     config_path = args[0]
 
+    started = time.time()
     cmd = [
         'task',
         'rc:%s' % config_path,
@@ -22,5 +24,8 @@ def main(*args):
     _, stderr = proc.communicate()
     if proc.returncode != 0:
         raise FailedToSynchronize(stderr)
+    finished = time.time()
 
-    return "Sync Successful"
+    total_duration = finished - started
+
+    return "Sync Successful", "time=%ss;0.5;5.0;0;99" % total_duration
