@@ -16,11 +16,11 @@ Nagios Plugin for monitoring Taskwarrior's Taskserver
 
 3. Add a hostgroup matching the hostgroup name above to your hostgroup configuration (e.g. ``/etc/nagios3/conf.d/hostgroups_nagios2.conf``):
    
-::
-
-    define hostgroup {
-         hostgroup_name                  taskservers
-         alias                           Taskd Servers
-         members                         your_hostname
-    }
+   ::
+   
+       define hostgroup {
+            hostgroup_name                  taskservers
+            alias                           Taskd Servers
+            members                         your_hostname
+       }
 
