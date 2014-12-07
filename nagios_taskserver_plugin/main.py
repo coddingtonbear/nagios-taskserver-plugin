@@ -7,9 +7,11 @@ def main(*args):
 
     started = time.time()
     subprocess.call(
-        'task',
-        'rc:%s' % config_path,
-        'sync',
+        [
+            'task',
+            'rc:%s' % config_path,
+            'sync',
+        ],
         shell=True,
     )
     finished = time.time()
