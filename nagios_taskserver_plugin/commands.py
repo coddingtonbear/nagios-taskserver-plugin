@@ -1,4 +1,5 @@
 import argparse
+import logging
 import subprocess
 import time
 
@@ -7,6 +8,9 @@ from .output import write_nagios_output
 
 
 COMMANDS = {}
+
+
+logger = logging.getLogger(__name__)
 
 
 def command(fn):
@@ -21,6 +25,7 @@ def status(args):
         type=str
     )
     args = parser.parse_args(args)
+    logger.info('Status check for taskrc at %s', args.config_path)
 
     started = time.time()
     cmd = [
@@ -28,6 +33,7 @@ def status(args):
         'rc:%s' % args.config_path,
         'sync',
     ]
+    logger.debug('Command: %s', cmd)
     proc = subprocess.Popen(
         cmd,
         shell=False,
@@ -35,6 +41,7 @@ def status(args):
         stderr=subprocess.PIPE
     )
     _, stderr = proc.communicate()
+    logger.debug('Return Code: %s; Stderr: %s', proc.returncode, stderr)
     if proc.returncode != 0:
         raise FailedToSynchronize(
             " ".join(stderr.split('\n')[1:])
@@ -42,6 +49,7 @@ def status(args):
     finished = time.time()
 
     total_duration = finished - started
+    logger.debug('Finished in %s seconds', total_duration)
 
     write_nagios_output(
         "Sync Successful",
@@ -69,18 +77,34 @@ def restart(args):
         type=int
     )
     args = parser.parse_args(args)
+    logger.info(
+        'Conditional restart: %s;%s;%s "%s"',
+        args.state,
+        args.state_type,
+        args.attempts,
+        args.restart_command
+    )
 
     is_soft_failure = (
         args.state == 'CRITICAL' and
         args.state_type == 'SOFT' and
-        args.attempts >= 3
+        args.attempts >= 2
     )
     is_hard_failure = (
         args.state == 'CRITICAL' and
         args.state_type == 'HARD'
     )
     if is_soft_failure or is_hard_failure:
-        subprocess.check_call(
+        logger.info(
+            "Requesting restart; calling %s",
             args.restart_command,
-            shell=True,
         )
+        try:
+            subprocess.check_call(
+                args.restart_command,
+                shell=True,
+            )
+        except Exception as e:
+            logger.exception(
+                "Subprocess call failed!: %s", e
+            )
