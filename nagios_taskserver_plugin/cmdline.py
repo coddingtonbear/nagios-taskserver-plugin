@@ -2,7 +2,9 @@ from __future__ import print_function
 
 import argparse
 import logging
+import os
 import sys
+import tempfile
 
 from .commands import COMMANDS
 from .exceptions import FailedToSynchronize
@@ -20,8 +22,11 @@ logger = logging.getLogger(__name__)
 
 def cmdline(sysargs=None):
     logging.basicConfig(
-        level=logging.DEBUG,
-        filename='/tmp/nagios-taskserver-plugin.log',
+        level=logging.INFO,
+        filename=os.path.join(
+            tempfile.gettempdir(),
+            'nagios-taskserver-plugin.log',
+        )
     )
     if not sysargs:
         sysargs = sys.argv[1:]
