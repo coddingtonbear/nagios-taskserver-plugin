@@ -1,8 +1,11 @@
 from __future__ import print_function
 
+import argparse
 import sys
 
-from .main import main, FailedToSynchronize
+from .commands import COMMANDS
+from .exceptions import FailedToSynchronize
+from .output import escape
 
 
 EXIT_OK = 0
@@ -11,36 +14,18 @@ EXIT_CRITICAL = 2
 EXIT_UNKNOWN = 3
 
 
-def escape(value):
-    return value.replace('|', '/').replace('\n', ' ').strip()
-
-
-def write_nagios_output(text, perfdata):
-    if isinstance(text, basestring):
-        text = text.split('\n')
-    if isinstance(perfdata, basestring):
-        perfdata = perfdata.split('\n')
-
-    sys.stdout.write(escape(text[0]))
-    if len(perfdata) > 0:
-        sys.stdout.write('|')
-        sys.stdout.write(escape(perfdata[0]))
-    sys.stdout.write('\n')
-    for idx, line in enumerate(text[1:]):
-        sys.stdout.write(escape(line))
-        if idx != len(text[1:]) - 1:
-            sys.stdout.write('\n')
-    if len(text[1:]) > 0:
-        sys.stdout.write('|')
-    for idx, line in enumerate(perfdata[1:]):
-        sys.stdout.write(escape(line))
-        sys.stdout.write('\n')
-
-
-def cmdline():
+def cmdline(sysargs=None):
+    if not sysargs:
+        sysargs = sys.argv[1:]
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        'command',
+        type=str,
+        choices=COMMANDS.keys()
+    )
+    args, extra = parser.parse_known_args(sysargs)
     try:
-        text, perfdata = main(*sys.argv[1:])
-        write_nagios_output(text, perfdata)
+        COMMANDS[args.command](args=extra)
         sys.exit(EXIT_OK)
     except FailedToSynchronize as e:
         print(escape(str(e)))

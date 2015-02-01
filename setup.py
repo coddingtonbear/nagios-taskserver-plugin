@@ -17,6 +17,9 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3',
     ],
+    install_requires=[
+        'argparse',
+    ],
     packages=find_packages(),
     entry_points={
         'console_scripts': [
