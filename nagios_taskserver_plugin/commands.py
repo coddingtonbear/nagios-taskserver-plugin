@@ -74,7 +74,7 @@ def restart(args):
     )
     parser.add_argument(
         'restart_command',
-        type=int
+        type=str
     )
     args = parser.parse_args(args)
     logger.info(
