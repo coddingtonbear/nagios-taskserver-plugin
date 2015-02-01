@@ -1,2 +1,2 @@
 include readme.rst
-recursive-include plugin tests *.rst *.txt *.json *.svg
+recursive-include plugin *
