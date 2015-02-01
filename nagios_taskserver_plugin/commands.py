@@ -94,6 +94,11 @@ def restart(args):
         args.state == 'CRITICAL' and
         args.state_type == 'HARD'
     )
+    logger.debug(
+        'Hard failure? %s; Soft failure? %s',
+        is_hard_failure,
+        is_soft_failure,
+    )
     if is_soft_failure or is_hard_failure:
         logger.info(
             "Requesting restart; calling %s",
