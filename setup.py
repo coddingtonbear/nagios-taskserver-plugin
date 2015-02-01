@@ -20,6 +20,7 @@ setup(
     install_requires=[
         'argparse',
     ],
+    include_package_data=True,
     packages=find_packages(),
     entry_points={
         'console_scripts': [
