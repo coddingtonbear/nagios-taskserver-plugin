@@ -5,6 +5,7 @@ import time
 
 from .exceptions import FailedToSynchronize
 from .output import write_nagios_output
+from .utils import attempt_synchronization
 
 
 COMMANDS = {}
@@ -18,6 +19,33 @@ def command(fn):
 
 
 @command
+def restart_if_failed(args):
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        'config_path',
+        type=str
+    )
+    parser.add_argument(
+        'restart_command',
+        type=str
+    )
+    args = parser.parse_args(args)
+
+    try:
+        attempt_synchronization(args.config_path)
+    except FailedToSynchronize:
+        try:
+            subprocess.check_call(
+                args.restart_command,
+                shell=True,
+            )
+        except Exception as e:
+            logger.exception(
+                "Subprocess call failed!: %s", e
+            )
+
+
+@command
 def status(args):
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -28,24 +56,7 @@ def status(args):
     logger.info('Status check for taskrc at %s', args.config_path)
 
     started = time.time()
-    cmd = [
-        'task',
-        'rc:%s' % args.config_path,
-        'sync',
-    ]
-    logger.debug('Command: %s', cmd)
-    proc = subprocess.Popen(
-        cmd,
-        shell=False,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
-    )
-    _, stderr = proc.communicate()
-    logger.debug('Return Code: %s; Stderr: %s', proc.returncode, stderr)
-    if proc.returncode != 0:
-        raise FailedToSynchronize(
-            " ".join(stderr.split('\n')[1:])
-        )
+    attempt_synchronization(args.config_path)
     finished = time.time()
 
     total_duration = finished - started
