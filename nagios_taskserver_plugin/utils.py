@@ -7,9 +7,9 @@ from .exceptions import FailedToSynchronize
 logger = logging.getLogger(__name__)
 
 
-def attempt_synchronization(config_path):
+def attempt_synchronization(config_path, task_binary='task'):
     cmd = [
-        'task',
+        task_binary,
         'rc:%s' % config_path,
         'sync',
     ]

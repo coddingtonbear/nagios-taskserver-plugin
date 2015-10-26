@@ -29,10 +29,18 @@ def restart_if_failed(args):
         'restart_command',
         type=str
     )
+    parser.add_argument(
+        '--task-binary',
+        type=str,
+        default='task'
+    )
     args = parser.parse_args(args)
 
     try:
-        attempt_synchronization(args.config_path)
+        attempt_synchronization(
+            args.config_path,
+            task_binary=args.task_binary
+        )
     except FailedToSynchronize:
         try:
             subprocess.check_call(
