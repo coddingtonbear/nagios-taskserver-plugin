@@ -41,7 +41,9 @@ def restart_if_failed(args):
             args.config_path,
             task_binary=args.task_binary
         )
+        logger.info('Sync proceeded successfully.')
     except FailedToSynchronize:
+        logger.info('Sync failed; issuing restart.')
         try:
             subprocess.check_call(
                 args.restart_command,

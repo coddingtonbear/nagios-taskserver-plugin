@@ -21,7 +21,7 @@ def attempt_synchronization(config_path, task_binary='task'):
         stderr=subprocess.PIPE
     )
     _, stderr = proc.communicate()
-    logger.debug('Return Code: %s; Stderr: %s', proc.returncode, stderr)
+    logger.info('Return Code: %s; Stderr: %s', proc.returncode, stderr)
     if proc.returncode != 0:
         raise FailedToSynchronize(
             " ".join(stderr.split('\n')[1:])
