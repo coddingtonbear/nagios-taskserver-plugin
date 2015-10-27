@@ -1,11 +1,12 @@
 import argparse
 import logging
+import signal
 import subprocess
 import time
 
 from .exceptions import FailedToSynchronize
 from .output import write_nagios_output
-from .utils import attempt_synchronization
+from .utils import attempt_synchronization, raise_synchronization_timeout
 
 
 COMMANDS = {}
@@ -34,14 +35,25 @@ def restart_if_failed(args):
         type=str,
         default='task'
     )
+    parser.add_argument(
+        '--timeout-seconds',
+        type=int,
+        default=30,
+    )
     args = parser.parse_args(args)
 
     try:
+        signal.signal(signal.SIGALRM, raise_synchronization_timeout)
+        signal.alarm(args.timeout_seconds)
+
         attempt_synchronization(
             args.config_path,
             task_binary=args.task_binary
         )
         logger.info('Sync proceeded successfully.')
+
+        # Reset the alarm
+        signal.alarm(0)
     except FailedToSynchronize:
         logger.info('Sync failed; issuing restart.')
         try:

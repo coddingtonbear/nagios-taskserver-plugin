@@ -1,10 +1,14 @@
 import logging
 import subprocess
 
-from .exceptions import FailedToSynchronize
+from .exceptions import FailedToSynchronize, SynchronizationTimeout
 
 
 logger = logging.getLogger(__name__)
+
+
+def raise_synchronization_timeout(*args):
+    raise SynchronizationTimeout()
 
 
 def attempt_synchronization(config_path, task_binary='task'):
