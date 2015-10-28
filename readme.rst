@@ -1,6 +1,10 @@
 Nagios Plugin for monitoring Taskwarrior's Taskserver
 =====================================================
 
+
+Using this with Nagios
+----------------------
+
 1. Install this package using pip::
 
     pip install nagios-taskserver-plugin
@@ -37,3 +41,12 @@ Nagios Plugin for monitoring Taskwarrior's Taskserver
             members                         your_hostname
        }
 
+
+Using this with a Cron Job
+--------------------------
+
+Add a cron job in a format like the following to your crontab::
+
+    * * * * * /usr/local/bin/nagios_taskserver_plugin restart_if_failed --task-binary=/usr/local/bin/task /var/taskd/nagios/taskrc "/usr/sbin/service taskd restart"
+
+replacing `/usr/local/bin/task` with the path to your Taskwarrior client, `/var/taskd/nagios/taskrc` with the path to your test clone's taskrc path, and `/usr/sbin/service taskd restart` with the command to run for restarting the Taskserver if it has become stuck.
