@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import argparse
 import logging
+from pathlib import Path
 import os
 import sys
 import tempfile
@@ -21,15 +22,22 @@ logger = logging.getLogger(__name__)
 
 
 def cmdline(sysargs=None):
-    logging.basicConfig(
-        level=logging.INFO,
-        filename=os.path.join(tempfile.gettempdir(), "nagios-taskserver-plugin.log",),
-    )
     if not sysargs:
         sysargs = sys.argv[1:]
     parser = argparse.ArgumentParser()
     parser.add_argument("command", type=str, choices=COMMANDS.keys())
+    parser.add_argument("--log-level", type=logging.getLevelName, default="INFO")
+    parser.add_argument(
+        "--log-path",
+        type=Path,
+        default=os.path.join(tempfile.gettempdir(), "nagios-taskserver-plugin.log",),
+    )
     args, extra = parser.parse_known_args(sysargs)
+
+    logging.basicConfig(
+        level=args.log_level, filename=args.log_path,
+    )
+
     logger.info("Starting; incoming arguments: %s", sysargs)
     try:
         logger.debug(
