@@ -1,4 +1,3 @@
-
 class FailedToSynchronize(Exception):
     pass
 
