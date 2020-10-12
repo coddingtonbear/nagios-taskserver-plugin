@@ -24,19 +24,22 @@ logger = logging.getLogger(__name__)
 def cmdline(sysargs=None):
     if not sysargs:
         sysargs = sys.argv[1:]
+
     parser = argparse.ArgumentParser()
     parser.add_argument("command", type=str, choices=COMMANDS.keys())
     parser.add_argument("--log-level", type=logging.getLevelName, default="INFO")
     parser.add_argument(
-        "--log-path",
-        type=Path,
-        default=os.path.join(tempfile.gettempdir(), "nagios-taskserver-plugin.log",),
+        "--log-path", type=Path,
     )
     args, extra = parser.parse_known_args(sysargs)
 
-    logging.basicConfig(
-        level=args.log_level, filename=args.log_path,
-    )
+    logging_args = {"level": args.log_level}
+    if args.log_path:
+        logging_args["stream"] = sys.stderr
+    else:
+        logging_args["filename"] = args.log_path
+
+    logging.basicConfig(**logging_args)
 
     logger.info("Starting; incoming arguments: %s", sysargs)
     try:
